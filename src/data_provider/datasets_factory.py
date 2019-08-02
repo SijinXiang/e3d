@@ -1,21 +1,3 @@
-# Copyright 2019 Google Inc. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-'''Data Provider.'''
-
-# from src.data_provider import kth_action
 from src.data_provider import milan
 
 def data_provider(dataset_name,
@@ -26,7 +8,8 @@ def data_provider(dataset_name,
 				in_seq_length,
 				out_seq_length,
 				dims_3D,
-				is_training=True):
+				is_training):
+
 	'''Returns a Dataset.
 
   Args:
@@ -80,26 +63,3 @@ def data_provider(dataset_name,
 		return train_input_handle, test_input_handle
 	else:
 		return test_input_handle
-
-'''
-  if dataset_name == 'action':
-    input_param = {
-        'paths': valid_data_list,
-        'image_width': img_width,
-        'minibatch_size': batch_size,
-        'seq_length': seq_length,
-        'input_data_type': 'float32',
-        'name': dataset_name + ' iterator'
-    }
-    input_handle = datasets_map[dataset_name].DataProcess(input_param)
-    if is_training:
-      train_input_handle = input_handle.get_train_input_handle()
-      train_input_handle.begin(do_shuffle=True)
-      test_input_handle = input_handle.get_test_input_handle()
-      test_input_handle.begin(do_shuffle=False)
-      return train_input_handle, test_input_handle
-    else:
-      test_input_handle = input_handle.get_test_input_handle()
-      test_input_handle.begin(do_shuffle=False)
-      return test_input_handle
-'''
