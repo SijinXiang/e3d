@@ -15,29 +15,30 @@
 
 cd ..
 python run.py \
-    --train_data_paths ../data/milan_tra.npy \
-    --valid_data_paths ../data/milan_val.npy \
-    --test_data_paths ../data/milan_test.npy \
-    --save_dir checkpoints/_mnist_e3d_lstm \
-    --gen_frm_dir results/_mnist_e3d_lstm \
-    --is_training False \
-    --dataset_name milan \
     --input_seq_length 4 \
     --output_seq_length 4 \
     --dimension_3D 1 \
-    --img_width 100 \
-    --model_name e3d_lstm \
     --num_hidden 4,4 \
     --filter_size 2 \
+    --lr 0.001 \
+    --batch_size 2 \
+    --max_iterations 5 \
+    --is_training True \
+    --pretrained_model checkpoints/model.ckpt \
+    --save_dir checkpoints/ \
+    --gen_frm_dir results/ \
+    --train_data_paths ../data/milan_tra.npy \
+    --valid_data_paths ../data/milan_val.npy \
+    --test_data_paths ../data/milan_test.npy \
+    --dataset_name milan \
+    --img_width 100 \
+    --model_name e3d_lstm \
     --layer_norm True \
     --scheduled_sampling True \
     --sampling_stop_iter 40 \
     --sampling_start_value 1.0 \
     --sampling_delta_per_iter 0.00002 \
-    --lr 0.001 \
-    --batch_size 2 \
-    --max_iterations 5 \
     --display_interval 1 \
     --test_interval 1 \
-    --snapshot_interval 5 \
+    --snapshot_interval 1 \
     --allow_gpu_growth True

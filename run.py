@@ -58,7 +58,7 @@ def add_arguments(parser):
 	parser.add_argument("--display_interval", type=int, default=1, help="number of iters showing training loss")
 	parser.add_argument("--test_interval", type=int, default=1, help="number of iters for test")
 	parser.add_argument("--snapshot_interval", type=int, default=50, help="number of iters saving models")
-	parser.add_argument("--num_save_samples", type=int, default=10, help="number of sequences to be saved")
+#	parser.add_argument("--num_save_samples", type=int, default=10, help="number of sequences to be saved")
 	parser.add_argument("--n_gpu", type=int, default=1, help="how many GPUs to distribute the training across")
 	parser.add_argument("--allow_gpu_growth", type="bool", nargs="?", const=True,
 					default=True, 
@@ -84,8 +84,10 @@ def main(unused_argv):
 
 	model = Model(FLAGS)
 
-	train_wrapper(model)
-	test_wrapper(model)
+	if FLAGS.is_training:
+		train_wrapper(model)
+	else:
+		test_wrapper(model)
 
 
 def schedule_sampling(eta, itr):
@@ -138,10 +140,7 @@ def train_wrapper(model):
 		if train_input_handle.no_batch_left():
 			train_input_handle.begin(do_shuffle=True)
 		ims = train_input_handle.get_batch()
-#         if FLAGS.dataset_name == 'penn':
-#             ims = ims['frame']
-#        Won't using paching
-#        ims = preprocess.reshape_patch(ims, FLAGS.patch_size)
+
 
 		eta, real_input_flag = schedule_sampling(eta, itr)
 
@@ -150,14 +149,14 @@ def train_wrapper(model):
 		if itr % FLAGS.snapshot_interval == 0:
 			model.save(itr)
 
-		#if itr % FLAGS.test_interval == 0:
-			#trainer.test(model, test_input_handle, FLAGS, itr)
+		if itr % FLAGS.test_interval == 0:
+			trainer.test(model, test_input_handle, FLAGS, itr)
 
 		train_input_handle.next_batch()
 
 
 def test_wrapper(model):
-	#model.load(FLAGS.pretrained_model)
+	model.load(FLAGS.pretrained_model)
 	test_input_handle = datasets_factory.data_provider(
 		FLAGS.dataset_name,
 		FLAGS.train_data_paths, 
