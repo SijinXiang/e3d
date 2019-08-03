@@ -5,6 +5,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
+import datetime
 import os
 import numpy as np
 from src.data_provider import datasets_factory
@@ -136,21 +138,31 @@ def train_wrapper(model):
 
 	eta = FLAGS.sampling_start_value
 
+	tra_cost = 0.0
+	batch_id = 0
 	for itr in range(1, FLAGS.max_iterations + 1):
 		if train_input_handle.no_batch_left():
+			print(datatime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'itr: ' + str(itr))
+			print('training loss: ' + str(tra_cost / batch_id))
+			if itr % (FLAGS.snapshot_interval * batch_id):
+				model.save(itr)
+				trainer.test(model, test_input_handle,FLAGS, itr)
 			train_input_handle.begin(do_shuffle=True)
-		ims = train_input_handle.get_batch()
+			tra_cost = 0
+			batch_id = 0
 
+		ims = train_input_handle.get_batch()
+		batch_id += 1
 
 		eta, real_input_flag = schedule_sampling(eta, itr)
 
-		trainer.train(model, ims, real_input_flag, FLAGS, itr)
+		tra_cost += trainer.train(model, ims, real_input_flag, FLAGS, itr)
 
-		if itr % FLAGS.snapshot_interval == 0:
-			model.save(itr)
+		#if itr % FLAGS.snapshot_interval == 0:
+			#model.save(itr)
 
-		if itr % FLAGS.test_interval == 0:
-			trainer.test(model, test_input_handle, FLAGS, itr)
+		#if itr % FLAGS.test_interval == 0:
+			#trainer.test(model, test_input_handle, FLAGS, itr)
 
 		train_input_handle.next_batch()
 

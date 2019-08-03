@@ -1,16 +1,16 @@
 cd ..
 python run.py \
     --input_seq_length 9 \
-    --output_seq_length 3 \
+    --output_seq_length 6 \
     --dimension_3D 3 \
     --num_hidden 8,8,4 \
     --filter_size 10 \
     --lr 0.01 \
-    --batch_size 10 \
+    --batch_size 12 \
     --max_iterations 50 \
     --is_training True \
-    --save_dir checkpoints/ \
-    --gen_frm_dir results/ \
+    --save_dir checkpoints/9-6/8-8-4 \
+    --gen_frm_dir results/9-6/8-8-4 \
     --train_data_paths data/milan_tra.npy \
     --valid_data_paths data/milan_val.npy \
     --test_data_paths data/milan_test.npy \
