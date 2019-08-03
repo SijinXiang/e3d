@@ -35,7 +35,7 @@ def rnn(images, real_input_flag, num_layers, num_hidden, configs):
 	total_length = int((configs.input_seq_length + configs.output_seq_length) / configs.dimension_3D)
 	input_length = int(configs.input_seq_length / configs.dimension_3D)
 
-	window_length = 2 # What is window_length?
+	window_length = 1 # What is window_length?
 	window_stride = 1
 
 	for i in range(num_layers):
@@ -43,13 +43,13 @@ def rnn(images, real_input_flag, num_layers, num_hidden, configs):
 			num_hidden_in = output_channels
 		else:
 			num_hidden_in = num_hidden[i - 1]
-            
+
 		new_lstm = eidetic_lstm(
 			name = 'e3d' + str(i),
 			input_shape = [ims_width, window_length, ims_height, num_hidden_in],
 			output_channels = num_hidden[i],
 			kernel_shape = [2, filter_size, filter_size]) # 5是不是可以用configs的filter size?
-        
+
 		lstm_layer.append(new_lstm)
 		zero_state = tf.zeros(
 			[batch_size, window_length, ims_width, ims_height, num_hidden[i]]) # 为什么第二维是window_length
@@ -63,9 +63,6 @@ def rnn(images, real_input_flag, num_layers, num_hidden, configs):
 	with tf.variable_scope('generator'):
 		input_list = []
 		reuse = False
-		for time_step in range(window_length - 1):
-			input_list.append(
-				tf.zeros([batch_size, ims_width, ims_height, output_channels]))
 
 		for time_step in range(total_length - 1):
 			with tf.variable_scope('e3d-lstm', reuse=reuse):
@@ -76,27 +73,28 @@ def rnn(images, real_input_flag, num_layers, num_hidden, configs):
 					input_frm = real_input_flag[:, time_diff] * images[:, time_step] + (1 - real_input_flag[:, time_diff]) * x_gen  # pylint: disable=used-before-assignment
 				input_list.append(input_frm)
 
-				if time_step % (window_length - window_stride) == 0:
-					input_frm = tf.stack(input_list[time_step:])
-					input_frm = tf.transpose(input_frm, [1, 0, 2, 3, 4])
 
-					for i in range(num_layers):
-						if time_step == 0:
-							c_history[i] = cell[i]
-						else:
-							c_history[i] = tf.concat([c_history[i], cell[i]], 1)
-						if i == 0:
-							inputs = input_frm
-						else:
-							inputs = hidden[i - 1]
-						hidden[i], cell[i], memory = lstm_layer[i](
-							inputs, hidden[i], cell[i], memory, c_history[i]) 
+				input_frm = tf.stack(input_list[time_step:])
+				input_frm = tf.transpose(input_frm, [1, 0, 2, 3, 4])
+
+				for i in range(num_layers):
+					if time_step == 0:
+						c_history[i] = cell[i]
+					else:
+						c_history[i] = tf.concat([c_history[i], cell[i]], 1)
+					if i == 0:
+						inputs = input_frm
+					else:
+						inputs = hidden[i - 1]
+					hidden[i], cell[i], memory = lstm_layer[i](
+						inputs, hidden[i], cell[i], memory, c_history[i]) 
                         #cell:Ckt-1, memory:zigzag global memory, c_history:eidetic_cell就是累积的Cell Mmemory
 
 				x_gen = tf.layers.conv3d(hidden[num_layers - 1], output_channels,
 										[window_length, 1, 1], [window_length, 1, 1],'same')
-                
+				print('x_gen shape before squeeze: ', tf.shape(x_gen))
 				x_gen = tf.squeeze(x_gen)
+				print('x_gen shape after squeeze: ', tf.shape(x_gen))
 				gen_images.append(x_gen)
 				reuse = True
 

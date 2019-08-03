@@ -124,7 +124,7 @@ class Model(object):
 		self.sess = tf.Session(config=config_prot)
 		self.sess.run(init)
 		if self.configs.pretrained_model:
-            		self.saver.restore(self.sess, self.configs.pretrained_model)
+			self.saver.restore(self.sess, self.configs.pretrained_model)
 
 	def train(self, inputs, lr, real_input_flag, itr):
 		feed_dict = {self.x[i]: inputs[i] for i in range(self.configs.n_gpu)}

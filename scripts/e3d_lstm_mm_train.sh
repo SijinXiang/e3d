@@ -1,8 +1,8 @@
 cd ..
 python run.py \
-    --input_seq_length 6 \
-    --output_seq_length 4 \
-    --dimension_3D 2 \
+    --input_seq_length 9 \
+    --output_seq_length 3 \
+    --dimension_3D 3 \
     --num_hidden 8,8,4 \
     --filter_size 10 \
     --lr 0.01 \
@@ -23,6 +23,6 @@ python run.py \
     --sampling_start_value 1.0 \
     --sampling_delta_per_iter 0.00002 \
     --display_interval 1 \
-    --test_interval 10 \
-    --snapshot_interval 10 \
+    --test_interval 5 \
+    --snapshot_interval 5 \
     --allow_gpu_growth True
