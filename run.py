@@ -140,13 +140,19 @@ def train_wrapper(model):
 
 	tra_cost = 0.0
 	batch_id = 0
+	stopping = [10000000000000000]
 	for itr in range(1, FLAGS.max_iterations + 1):
 		if train_input_handle.no_batch_left():
-			print(datatime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'itr: ' + str(itr))
+			model.save(itr)
+			print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'itr: ' + str(itr))
 			print('training loss: ' + str(tra_cost / batch_id))
-			if itr % (FLAGS.snapshot_interval * batch_id):
-				model.save(itr)
-				trainer.test(model, test_input_handle,FLAGS, itr)
+			val_cost = trainer.test(model, test_input_handle,FLAGS, itr)
+			if val_cost < stopping[-1]:
+				stopping = [val_cost]
+			elif len(stopping) < 10:
+				stopping.append(val_cost)
+			if len(stopping) == 10:
+				break
 			train_input_handle.begin(do_shuffle=True)
 			tra_cost = 0
 			batch_id = 0

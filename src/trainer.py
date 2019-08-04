@@ -82,10 +82,11 @@ def test(model, test_input_handle, configs, save_name):
 
 
 	avg_mse = avg_mse / test_input_handle.total()
-	avg_mse_snapshot = avg_mse / (configs.output_seq_length * configs.dimension_3D)
+	avg_mse_snapshot = avg_mse / (configs.output_seq_length)
 
 	if configs.is_training:
 		print('validation loss:\n' + 'mse per seq: ' + str(avg_mse) + '\tmse per snapshot: ' + str(avg_mse_snapshot))
+		return avg_mse
 	else:
 		avg_result = np.zeros(2)
 		avg_result[0] = avg_mse
