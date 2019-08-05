@@ -147,7 +147,7 @@ def train_wrapper(model):
 			print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'itr: ' + str(itr))
 			print('training loss: ' + str(tra_cost / batch_id))
 			val_cost = trainer.test(model, test_input_handle,FLAGS, itr)
-			if val_cost < stopping[-1]:
+			if val_cost < min(stopping):
 				stopping = [val_cost]
 			elif len(stopping) < 10:
 				stopping.append(val_cost)

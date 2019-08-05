@@ -1,16 +1,17 @@
 cd ..
 python run.py \
+    --pretrained_model pretrain/model.ckpt-603 \
     --input_seq_length 6 \
     --output_seq_length 6 \
-    --dimension_3D 2 \
-    --num_hidden 10,10,10 \
-    --filter_size 10 \
-    --lr 0.01 \
+    --dimension_3D 3 \
+    --num_hidden 10,10,10,5 \
+    --filter_size 20 \
+    --lr 0.0001 \
     --batch_size 12 \
-    --max_iterations 70000 \
+    --max_iterations 5000 \
     --is_training True \
-    --save_dir checkpoints/6-6/10-10-10 \
-    --gen_frm_dir results/6-6/10-10-10 \
+    --save_dir checkpoints/6-6/10-10-10-5 \
+    --gen_frm_dir results/6-6/10-10-10-5 \
     --train_data_paths data/milan_tra.npy \
     --valid_data_paths data/milan_val.npy \
     --test_data_paths data/milan_test.npy \
