@@ -10,6 +10,7 @@ class InputHandle(object):
 	"""Class for handling dataset inputs."""
 
 	def __init__(self, input_param):
+		self.is_tra_set = input_param['tra_set']
 		self.paths = input_param['paths']
 		self.name = input_param['name']
 		self.input_data_type = input_param.get('input_data_type', 'float32')
@@ -26,6 +27,8 @@ class InputHandle(object):
 		self.current_batch_size = 0
 		self.current_batch_indices = []
 		self.current_input_length = 0
+		self.mean = 0
+		self.std = 0
 		self.load()
 
 
@@ -33,18 +36,36 @@ class InputHandle(object):
 		"""Load the data."""
 		snapshots = np.load(self.paths)
 		total_shots = snapshots.shape[0]
-		timestep = self.input_seq_length // self.dims_3D
 
-		for i in range(total_shots // (self.input_seq_length+self.output_seq_length)):
-			start = int(i * (self.input_seq_length + self.output_seq_length))
-			end = int((i+1) * (self.input_seq_length + self.output_seq_length))
+		self.mean = np.mean(snapshots)
+		self.std = np.std(snapshots)
+		snapshots = (snapshots - self.mean) / self.std
 
-			in_raw = snapshots[start:start+self.input_seq_length].reshape((timestep, self.dims_3D, 100, 100))
-			out_raw = snapshots[start+self.input_seq_length:end].reshape((-1, self.dims_3D, 100, 100))
+		if not self.is_tra_set:
+			timestep = self.input_seq_length // self.dims_3D
 
-			self.data['input_raw_data'].append(in_raw)
-			self.data['output_raw_data'].append(out_raw)
+			for i in range(total_shots // (self.input_seq_length+self.output_seq_length)):
+				start = int(i * (self.input_seq_length + self.output_seq_length))
+				end = int((i+1) * (self.input_seq_length + self.output_seq_length))
 
+				in_raw = snapshots[start:start+self.input_seq_length].reshape((timestep, self.dims_3D, 100, 100))
+				out_raw = snapshots[start+self.input_seq_length:end].reshape((-1, self.dims_3D, 100, 100))
+
+				self.data['input_raw_data'].append(in_raw)
+				self.data['output_raw_data'].append(out_raw)
+
+		else:
+			total_sequence = total_shots - (self.input_seq_length + self.output_seq_length) + 1
+			for i in range(total_sequence):
+				end = int(i + (self.input_seq_length + self.output_seq_length))
+
+				in_raw = snapshots[i:i+self.input_seq_length].reshape((-1, self.dims_3D, 100, 100))
+				out_raw = snapshots[i+self.input_seq_length:end].reshape((-1, self.dims_3D, 100, 100))
+                
+				self.data['input_raw_data'].append(in_raw)
+				self.data['output_raw_data'].append(out_raw)
+
+        
 
 	def total(self):
 		"""Returns the total number of clips."""

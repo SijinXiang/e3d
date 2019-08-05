@@ -35,6 +35,7 @@ def data_provider(dataset_name,
 		raise ValueError('Name of dataset unknown %s' % dataset_name)
         
 	test_input_param = {
+		'tra_set': False,
 		'paths': valid_data_paths,
 		'minibatch_size': batch_size,
 		'input_data_type': 'float32',
@@ -49,6 +50,7 @@ def data_provider(dataset_name,
     
 	if is_training:
 		train_input_param = {
+			'tra_set': True,
 			'paths': train_data_paths,
 			'minibatch_size': batch_size,
 			'input_data_type': 'float32',
