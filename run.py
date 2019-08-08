@@ -38,7 +38,7 @@ def add_arguments(parser):
 	parser.add_argument("--reverse_input", type="bool", nargs="?", const=True,
 					default=False, 
 					help="reverse the input/outputs during training.")
-    
+
 	parser.add_argument("--model_name", type=str, default="e3d_lstm", help="The name of the architecture")
 	parser.add_argument("--pretrained_model", type=str, default="", help=".ckpt file to initialize from")
 	parser.add_argument("--num_hidden", type=str, default="10,10,10,10", help="COMMA separated number of units of e3d lstms")
@@ -53,7 +53,7 @@ def add_arguments(parser):
 	parser.add_argument("--sampling_stop_iter", type=int, default=40, help="for scheduled sampling")
 	parser.add_argument("--sampling_start_value", type=float, default=1.0, help="for scheduled sampling")
 	parser.add_argument("--sampling_changing_rate", type=float, default=0.00002, help="for scheduled sampling")
-    
+
 	parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
 	parser.add_argument("--batch_size", type=int, default=50, help="batch size for training")
 	parser.add_argument("--max_iterations", type=int, default=50, help="max num of steps")
@@ -72,9 +72,10 @@ def main(unused_argv):
 	"""Main function."""
 	print(FLAGS)
 	# print(FLAGS.reverse_input)
-	if tf.gfile.Exists(FLAGS.save_dir):
-		tf.gfile.DeleteRecursively(FLAGS.save_dir)
-	tf.gfile.MakeDirs(FLAGS.save_dir)
+	if FLAGS.is_training:
+		if tf.gfile.Exists(FLAGS.save_dir):
+			tf.gfile.DeleteRecursively(FLAGS.save_dir)
+		tf.gfile.MakeDirs(FLAGS.save_dir)
 	if tf.gfile.Exists(FLAGS.gen_frm_dir):
 		tf.gfile.DeleteRecursively(FLAGS.gen_frm_dir)
 	tf.gfile.MakeDirs(FLAGS.gen_frm_dir)
@@ -135,14 +136,18 @@ def train_wrapper(model):
 		FLAGS.output_seq_length,
 		FLAGS.dimension_3D,
 		is_training=True)
-
+	print('Data loaded.')
 	eta = FLAGS.sampling_start_value
 
 	tra_cost = 0.0
 	batch_id = 0
 	stopping = [10000000000000000]
-	for itr in range(1, FLAGS.max_iterations + 1):
-		if train_input_handle.no_batch_left():
+	for itr in range(2351, FLAGS.max_iterations + 1):
+		if itr == 2:
+			print('training process started.')
+		#if itr % 50 == 0:
+		#	print('training timestep: ' + str(itr))
+		if train_input_handle.no_batch_left() or itr % 50 == 0:
 			model.save(itr)
 			print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'itr: ' + str(itr))
 			print('training loss: ' + str(tra_cost / batch_id))

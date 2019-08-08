@@ -1,20 +1,20 @@
 cd ..
 python run.py \
-    --pretrained_model pretrain/model.ckpt-603 \
+    --pretrained_model pretrain/model.ckpt-2350 \
     --input_seq_length 6 \
     --output_seq_length 6 \
     --dimension_3D 3 \
-    --num_hidden 10,10,10,5 \
+    --num_hidden 25,25 \
     --filter_size 20 \
-    --lr 0.0001 \
-    --batch_size 12 \
-    --max_iterations 5000 \
+    --lr 0.001 \
+    --batch_size 16 \
+    --max_iterations 10000 \
     --is_training True \
-    --save_dir checkpoints/6-6/10-10-10-5 \
-    --gen_frm_dir results/6-6/10-10-10-5 \
+    --save_dir checkpoints/6-6/25-25 \
+    --gen_frm_dir results/6-6/25-25 \
     --train_data_paths data/milan_tra.npy \
     --valid_data_paths data/milan_val.npy \
-    --test_data_paths data/milan_test.npy \
+    --test_data_paths data/milan_val.npy \
     --dataset_name milan \
     --img_width 100 \
     --model_name e3d_lstm \

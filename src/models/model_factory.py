@@ -30,7 +30,7 @@ def adam_updates(params, cost_or_grads, lr=0.001, mom1=0.9, mom2=0.999):
 		grads = tf.gradients(cost_or_grads, params)
 	else:
 		grads = cost_or_grads
-	t = tf.Variable(1., 'adam_t')
+	t = tf.Variable(1., name='adam_t')
 	for p, g in zip(params, grads):
 		mg = tf.Variable(tf.zeros(p.get_shape()), p.name + '_adam_mg')
 		if mom1 > 0:

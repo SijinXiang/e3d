@@ -19,7 +19,7 @@ class InputHandle(object):
 		self.input_seq_length = input_param['input_seq_length']
 		self.output_seq_length = input_param['output_seq_length']
 		self.dims_3D = input_param['3D_dims']
-        
+
 		self.data = {'input_raw_data': [],
 					'output_raw_data': []}
 		self.indices = []
@@ -40,6 +40,7 @@ class InputHandle(object):
 		self.mean = np.mean(snapshots)
 		self.std = np.std(snapshots)
 		snapshots = (snapshots - self.mean) / self.std
+		#snapshots = np.nan_to_num(np.true_divide(norm, self.std))
 
 		if not self.is_tra_set:
 			timestep = self.input_seq_length // self.dims_3D
@@ -61,11 +62,11 @@ class InputHandle(object):
 
 				in_raw = snapshots[i:i+self.input_seq_length].reshape((-1, self.dims_3D, 100, 100))
 				out_raw = snapshots[i+self.input_seq_length:end].reshape((-1, self.dims_3D, 100, 100))
-                
+
 				self.data['input_raw_data'].append(in_raw)
 				self.data['output_raw_data'].append(out_raw)
 
-        
+
 
 	def total(self):
 		"""Returns the total number of clips."""
@@ -75,7 +76,7 @@ class InputHandle(object):
 	def begin(self, do_shuffle=True):
 		"""Move to the begin of the batch."""
 		self.indices = np.arange(self.total(), dtype='int32')
-        
+
 		if do_shuffle:
 			random.shuffle(self.indices)
 
