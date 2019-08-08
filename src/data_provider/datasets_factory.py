@@ -10,27 +10,6 @@ def data_provider(dataset_name,
 				dims_3D,
 				is_training):
 
-	'''Returns a Dataset.
-
-  Args:
-    dataset_name: String, the name of the dataset.
-    train_data_paths: List, [train_data_path1, train_data_path2...]
-    valid_data_paths: List, [val_data_path1, val_data_path2...]
-    batch_size: Int, the batch size.
-    img_width: Int, the width of input images.
-    in_seq_length, number of input snapshots.
-    out_seq_length, number of output snapshots.
-    dims_3D, dimension of depth channel of 3D encoder
-    is_training: Bool, training or testing.
-
-  Returns:
-      if is_training is True, it returns two dataset instances for both
-      training and evaluation. Otherwise only one dataset instance for
-      evaluation.
-  Raises:
-      ValueError: When `dataset_name` is unknown.
-	'''
-
 	if dataset_name != 'milan':
 		raise ValueError('Name of dataset unknown %s' % dataset_name)
         

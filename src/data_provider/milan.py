@@ -49,8 +49,8 @@ class InputHandle(object):
 				start = int(i * (self.input_seq_length + self.output_seq_length))
 				end = int((i+1) * (self.input_seq_length + self.output_seq_length))
 
-				in_raw = snapshots[start:start+self.input_seq_length].reshape((timestep, self.dims_3D, 100, 100))
-				out_raw = snapshots[start+self.input_seq_length:end].reshape((-1, self.dims_3D, 100, 100))
+				in_raw = snapshots[start:start+self.input_seq_length].reshape((-1, self.dims_3D, 100, 100, 1))
+				out_raw = snapshots[start+self.input_seq_length:end].reshape((-1, self.dims_3D, 100, 100, 1))
 
 				self.data['input_raw_data'].append(in_raw)
 				self.data['output_raw_data'].append(out_raw)
@@ -60,8 +60,8 @@ class InputHandle(object):
 			for i in range(total_sequence):
 				end = int(i + (self.input_seq_length + self.output_seq_length))
 
-				in_raw = snapshots[i:i+self.input_seq_length].reshape((-1, self.dims_3D, 100, 100))
-				out_raw = snapshots[i+self.input_seq_length:end].reshape((-1, self.dims_3D, 100, 100))
+				in_raw = snapshots[i:i+self.input_seq_length].reshape((-1, self.dims_3D, 100, 100, 1))
+				out_raw = snapshots[i+self.input_seq_length:end].reshape((-1, self.dims_3D, 100, 100, 1))
 
 				self.data['input_raw_data'].append(in_raw)
 				self.data['output_raw_data'].append(out_raw)
@@ -115,13 +115,12 @@ class InputHandle(object):
 		if self.no_batch_left():
 			return None
 
-		input_batch = np.zeros((self.current_batch_size, int(self.input_seq_length / self.dims_3D), self.dims_3D, 100, 100))
+		input_batch = np.zeros((self.current_batch_size, self.input_seq_length // self.dims_3D, self.dims_3D, 100, 100, 1))
 
 		for i in range(self.current_batch_size):
 			batch_ind = self.current_batch_indices[i]
 			input_batch[i] = self.data['input_raw_data'][batch_ind]
 
-		input_batch = np.transpose(input_batch, (0, 1, 3, 4, 2))
 		return input_batch
 
 
@@ -130,13 +129,12 @@ class InputHandle(object):
 		if self.no_batch_left():
 			return None
 
-		output_batch = np.zeros((self.current_batch_size, int(self.output_seq_length / self.dims_3D), self.dims_3D, 100, 100))
+		output_batch = np.zeros((self.current_batch_size, self.output_seq_length // self.dims_3D, self.dims_3D, 100, 100, 1))
 
 		for i in range(self.current_batch_size):
 			batch_ind = self.current_batch_indices[i]
 			output_batch[i] = self.data['output_raw_data'][batch_ind]
 
-		output_batch = np.transpose(output_batch, (0, 1, 3, 4, 2))
 		return output_batch
 
 
